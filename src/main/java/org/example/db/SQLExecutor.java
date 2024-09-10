@@ -10,9 +10,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,8 +33,8 @@ public class SQLExecutor implements AutoCloseable {
     public void executeUpdate(String sql) {
         logger.info("Executing SQL update...");
         Timer.Context context = metricRegistry.timer("sql-update-timer").time();
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate(sql);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.executeUpdate();
             logger.info("SQL update executed successfully");
         } catch (SQLException e) {
             logger.error("Failed to execute SQL update", e);
@@ -45,40 +45,48 @@ public class SQLExecutor implements AutoCloseable {
     }
 
     /**
-     * Executes a SQL SELECT statement that returns data.
-     */
-    public Optional<ResultSet> executeQuery(String sql) {
-        logger.info("Executing SQL query...");
-        Timer.Context context = metricRegistry.timer("sql-query-timer").time();
-        try {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            return Optional.of(statement.executeQuery(sql));
-        } catch (SQLException e) {
-            logger.error("Failed to execute SQL query", e);
-            return Optional.empty();
-        } finally {
-            context.stop();
-        }
-    }
-
-    /**
      * Executes multiple SQL statements as a batch.
      */
+//    public void executeBatch(String sql) {
+//        logger.info("Executing SQL batch using PreparedStatement...");
+//        Timer.Context context = metricRegistry.timer("sql-batch-query-timer").time();
+//        String[] sqlStatements = sql.split(";");
+//        try {
+//            for (String sqlStatement : sqlStatements) {
+//                sqlStatement = sqlStatement.trim();
+//                if (!sqlStatement.trim().isEmpty()) {
+//                    try (PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement)) {
+//                        preparedStatement.addBatch();
+//                        preparedStatement.executeBatch();
+//                    }
+//                }
+//            }
+//            logger.info("SQL batch executed successfully using PreparedStatement");
+//        } catch (SQLException e) {
+//            logger.error("Failed to execute SQL batch", e);
+//            throw new RuntimeException("SQL batch execution failed", e);
+//        } finally {
+//            context.stop();
+//        }
+//    }
+
     public void executeBatch(String sql) {
-        logger.info("Executing SQL batch...");
+        logger.info("Executing SQL using PreparedStatement...");
         Timer.Context context = metricRegistry.timer("sql-batch-query-timer").time();
         String[] sqlStatements = sql.split(";");
-        try (Statement statement = connection.createStatement()) {
+        try {
             for (String sqlStatement : sqlStatements) {
-                if (!sqlStatement.trim().isEmpty()) {
-                    statement.addBatch(sqlStatement.trim());
+                sqlStatement = sqlStatement.trim();
+                if (!sqlStatement.isEmpty()) {
+                    try (PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement)) {
+                        preparedStatement.executeUpdate();
+                    }
                 }
             }
-            statement.executeBatch();
-            logger.info("SQL batch executed successfully");
+            logger.info("SQL executed successfully using PreparedStatement");
         } catch (SQLException e) {
-            logger.error("Failed to execute SQL batch", e);
-            throw new RuntimeException("SQL batch execution failed", e);
+            logger.error("Failed to execute SQL", e);
+            throw new RuntimeException("SQL execution failed", e);
         } finally {
             context.stop();
         }
@@ -92,13 +100,14 @@ public class SQLExecutor implements AutoCloseable {
         try {
             String sql = new String(Files.readAllBytes(path));
 
-            try (Statement statement = connection.createStatement();
-                 ResultSet rs = statement.executeQuery(sql)) {
-                if (!rs.isBeforeFirst()) {
-                    return Optional.empty();
-                }
-                while (rs.next()) {
-                    result.add(mapper.map(rs));
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                try (ResultSet rs = preparedStatement.executeQuery()) {
+                    if (!rs.isBeforeFirst()) {
+                        return Optional.empty();
+                    }
+                    while (rs.next()) {
+                        result.add(mapper.map(rs));
+                    }
                 }
             }
         } catch (SQLException | IOException e) {

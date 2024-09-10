@@ -20,6 +20,7 @@ public class Constants {
     public static final String FIND_MAX_PROJECT_CLIENT_SQL = "find_max_projects_client.sql";
     public static final String FIND_YOUNGEST_ELDEST_SQL = "find_youngest_eldest_workers.sql";
     public static final String PRINT_PROJECT_PRICES_SQL = "print_project_prices.sql";
+    public static final String DROP_TABLES_SQL = "drop_tables.sql";
 
     // Generate full SQL file path based on database type
     public static String getSqlFilePath(DatabaseType databaseType, String fileName) {

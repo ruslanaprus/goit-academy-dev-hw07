@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -35,29 +36,34 @@ public class DatabaseDropTableService {
     }
 
     public void dropAllTables() {
+        String fetchTablesSQL = "SELECT tablename FROM pg_tables WHERE schemaname = 'public'";
         try (Connection connection = connectionManager.getConnection();
-             Statement statement = connection.createStatement()) {
+             PreparedStatement preparedStatement = connection.prepareStatement(fetchTablesSQL)) {
 
-            ResultSet resultSet = statement.executeQuery(
-                    "SELECT tablename FROM pg_tables WHERE schemaname = 'public'");
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
                 String tableName = resultSet.getString("tablename");
                 dropTable(connection, tableName);
             }
         } catch (Exception e) {
-            logger.error("Failed to drop all tables {}", e.getMessage());
+            logger.error("Failed to drop all tables: {}", e.getMessage());
         }
     }
 
     private void dropTable(Connection connection, String tableName) {
+        if (!tableName.matches("[a-zA-Z_][a-zA-Z0-9_]*")) {
+            logger.error("Invalid table name: '{}'", tableName);
+            return;
+        }
+
         String dropTableSQL = "DROP TABLE IF EXISTS " + tableName + " CASCADE";
-        try {
-            SQLExecutor executor = new SQLExecutor(connection, metricRegistry);
-            executor.executeUpdate(dropTableSQL);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(dropTableSQL)) {
+            preparedStatement.executeUpdate();
             logger.info("Table '{}' dropped successfully.", tableName);
         } catch (Exception e) {
             logger.error("Failed to drop table '{}': {}", tableName, e.getMessage());
         }
     }
+
 }

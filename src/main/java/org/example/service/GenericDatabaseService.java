@@ -23,9 +23,7 @@ public class GenericDatabaseService<T> {
     public void insertEntities(String sql, List<T> entities, EntityMapper<T> mapper) {
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            logger.info("received a list");
             for (T entity : entities) {
-                logger.info("meow");
                 mapper.mapToStatement(statement, entity);
                 statement.addBatch();
             }

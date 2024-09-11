@@ -49,42 +49,42 @@ public class AppLauncher {
         dropTables = getSqlFilePath(dbType, DROP_TABLES_SQL);
 
         // Drop tables if needed
-//        DatabaseDropTableService dropTableService = DatabaseServiceFactory.createDatabaseDropTableService(connectionManager, metricRegistry);
-//        dropTableService.dropAllTables();
-//
-//        // Initialize and populate the database
-//        DatabaseInitService initService = DatabaseServiceFactory.createDatabaseInitService(connectionManager, metricRegistry);
-//        initService.initializeDatabase(initSql);
+        DatabaseDropTableService dropTableService = DatabaseServiceFactory.createDatabaseDropTableService(connectionManager, metricRegistry);
+        dropTableService.dropAllTables(dropTables);
+
+        // Initialize and populate the database
+        DatabaseInitService initService = DatabaseServiceFactory.createDatabaseInitService(connectionManager, metricRegistry);
+        initService.initializeDatabase(initSql);
 
         DatabasePopulateService populateService = DatabaseServiceFactory.createDatabasePopulateService(connectionManager, metricRegistry);
-        populateService.seedDatabase();
+        populateService.addEntities(populateSql);
 
         // Query operations
-//        DatabaseQueryService queryService = DatabaseServiceFactory.createDatabaseQueryService(connectionManager, metricRegistry);
-//
-//        queryService.findMaxSalaryWorker(maxSalarySql).ifPresent(workers -> {
-//            logger.info("MaxSalaryWorker(s) found: {}", workers.size());
-//            workers.forEach(worker -> logger.info(worker.toString()));
-//        });
-//
-//        queryService.findMaxProjectsClient(maxProjectClientSql).ifPresent(clients -> {
-//            logger.info("MaxProjectCountClient(s) found: {}", clients.size());
-//            clients.forEach(client -> logger.info(client.toString()));
-//        });
-//
-//        queryService.printProjectPrices(projectPricesSql).ifPresent(projects -> {
-//            logger.info("ProjectPriceInfo(s) found: {}", projects.size());
-//            projects.forEach(project -> logger.info(project.toString()));
-//        });
-//
-//        queryService.findLongestProject(longestProjectSql).ifPresent(projects -> {
-//            logger.info("LongestProject(s) found: {}", projects.size());
-//            projects.forEach(project -> logger.info(project.toString()));
-//        });
-//
-//        queryService.findYoungestEldestWorker(youngestEldestSql).ifPresent(workers -> {
-//            logger.info("YoungestEldestWorker(s) found: {}", workers.size());
-//            workers.forEach(worker -> logger.info(worker.toString()));
-//        });
+        DatabaseQueryService queryService = DatabaseServiceFactory.createDatabaseQueryService(connectionManager, metricRegistry);
+
+        queryService.findMaxSalaryWorker(maxSalarySql).ifPresent(workers -> {
+            logger.info("MaxSalaryWorker(s) found: {}", workers.size());
+            workers.forEach(worker -> logger.info(worker.toString()));
+        });
+
+        queryService.findMaxProjectsClient(maxProjectClientSql).ifPresent(clients -> {
+            logger.info("MaxProjectCountClient(s) found: {}", clients.size());
+            clients.forEach(client -> logger.info(client.toString()));
+        });
+
+        queryService.printProjectPrices(projectPricesSql).ifPresent(projects -> {
+            logger.info("ProjectPriceInfo(s) found: {}", projects.size());
+            projects.forEach(project -> logger.info(project.toString()));
+        });
+
+        queryService.findLongestProject(longestProjectSql).ifPresent(projects -> {
+            logger.info("LongestProject(s) found: {}", projects.size());
+            projects.forEach(project -> logger.info(project.toString()));
+        });
+
+        queryService.findYoungestEldestWorker(youngestEldestSql).ifPresent(workers -> {
+            logger.info("YoungestEldestWorker(s) found: {}", workers.size());
+            workers.forEach(worker -> logger.info(worker.toString()));
+        });
     }
 }

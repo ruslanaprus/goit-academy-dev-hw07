@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS worker (
 	name VARCHAR(1000) NOT NULL CHECK (length(name) BETWEEN 2 AND 1000),
 	birthday DATE CHECK (EXTRACT(YEAR FROM birthday) BETWEEN 1901 AND EXTRACT(YEAR FROM CURRENT_DATE)),
     email VARCHAR(1000) UNIQUE,
-	level VARCHAR(10) NOT NULL CHECK (level IN('Trainee', 'Junior', 'Middle', 'Senior')),
+	level VARCHAR(10) NOT NULL CHECK (level IN('trainee', 'junior', 'middle', 'senior')),
 	salary INTEGER NOT NULL CHECK (salary BETWEEN 100 AND 100000)
 );
 

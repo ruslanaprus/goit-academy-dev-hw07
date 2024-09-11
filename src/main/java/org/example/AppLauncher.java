@@ -50,7 +50,7 @@ public class AppLauncher {
 
         // Drop tables if needed
         DatabaseDropTableService dropTableService = DatabaseServiceFactory.createDatabaseDropTableService(connectionManager, metricRegistry);
-        dropTableService.dropAllTables(dropTables);
+        dropTableService.dropAllTables();
 
         // Initialize and populate the database
         DatabaseInitService initService = DatabaseServiceFactory.createDatabaseInitService(connectionManager, metricRegistry);

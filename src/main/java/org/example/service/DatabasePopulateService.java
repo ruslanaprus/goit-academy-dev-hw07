@@ -78,7 +78,6 @@ public class DatabasePopulateService {
                 } else if (sqlStatement.startsWith("INSERT INTO project ")) {
                     projectService.insertEntities(sqlStatement, projects, new ProjectMapper());
                 } else if (sqlStatement.startsWith("INSERT INTO project_worker")) {
-                    System.out.println("sqlStatement = " + sqlStatement);
                     projectWorkerService.insertEntities(sqlStatement, projectWorkers, new ProjectWorkerMapper());
                 } else {
                     logger.warn("Unknown SQL statement: {}", sqlStatement);

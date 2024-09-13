@@ -93,11 +93,6 @@ public class SQLExecutor implements AutoCloseable {
         return Optional.of(result);
     }
 
-    @FunctionalInterface
-    public interface ResultSetMapper<T> {
-        T map(ResultSet rs) throws SQLException;
-    }
-
     @Override
     public void close() {
         try {

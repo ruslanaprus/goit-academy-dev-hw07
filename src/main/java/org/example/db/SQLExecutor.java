@@ -44,32 +44,6 @@ public class SQLExecutor implements AutoCloseable {
         }
     }
 
-    /**
-     * Executes multiple SQL statements as a batch.
-     */
-//    public void executeBatch(String sql) {
-//        logger.info("Executing SQL batch using PreparedStatement...");
-//        Timer.Context context = metricRegistry.timer("sql-batch-query-timer").time();
-//        String[] sqlStatements = sql.split(";");
-//        try {
-//            for (String sqlStatement : sqlStatements) {
-//                sqlStatement = sqlStatement.trim();
-//                if (!sqlStatement.trim().isEmpty()) {
-//                    try (PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement)) {
-//                        preparedStatement.addBatch();
-//                        preparedStatement.executeBatch();
-//                    }
-//                }
-//            }
-//            logger.info("SQL batch executed successfully using PreparedStatement");
-//        } catch (SQLException e) {
-//            logger.error("Failed to execute SQL batch", e);
-//            throw new RuntimeException("SQL batch execution failed", e);
-//        } finally {
-//            context.stop();
-//        }
-//    }
-
     public void executeBatch(String sql) {
         logger.info("Executing SQL using PreparedStatement...");
         Timer.Context context = metricRegistry.timer("sql-batch-query-timer").time();
